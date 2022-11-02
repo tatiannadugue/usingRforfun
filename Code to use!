@@ -1,0 +1,148 @@
+---
+title: "fun art plots!"
+author: "Tatianna Dugue" & Original birthday code is from  "https://gist.github.com/jenitivecase/66ea1033fdcf71c2e8ad6d00fd32e54f"
+date: "2022-08-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+########INTRO######
+#some of this code is based off of jenitivecase's github page https://gist.github.com/jenitivecase/66ea1033fdcf71c2e8ad6d00fd32e54f and is expanded on to teach ggplot in a fun way so you make birthday plots (line 76) as well as fun abstract map graphs. Thank you jenitivecase! The abstract map is of my own design and happenstances in R. Now let's get into it!
+
+#Getting started
+```{r}
+#IF ANY OF THESE PACKAGES DO NOT LOAD THAT IS BC YOU HAVE DOWNLOADED THEM BEFORE ON YOUR R. UNHASHTAG THE CODE BELOW TO DOWNLOAD THE PACKAGES FIRST AND THEN LOAD THEM VIA THE LIBRARY FXN in the next chunk
+
+#install.packages(c("readr","tidyverse","rworldmap","jpeg","grid"))
+#devtools::install_github("dill/emoGG")
+#install.packages("emoGG")
+```
+
+#load in your packages
+```{r}
+###essential packages###
+library(readr) #to read in the data
+library(tidyverse) #like a mega universal package (contains many other helpful packages like ggplot in it as well as our dataframe)
+
+###for making the abstract map###
+library(rworldmap) #necessary for map visuals
+
+
+###for making birthday plot###
+library(emoGG) #inserts emojis!
+library(jpeg) #allows R to read and "download" your image of choice 
+library(grid) #puts a "Raster object" or a background image on your plot
+```
+
+#set your working directory
+```{r}
+getwd() #this tells you what folder youre working in rn and if its the one you intended to use
+
+setwd("C:Users/yourcomputername/thefolderofinterest")  #this folder should contain the jpg image you downloaded for your plot with a background image
+
+#check again if your working directory is now where your files of interest are!
+getwd()
+```
+
+
+#Making a funky map graph
+```{r}
+#our dataframe with continents and countries
+wdf<- population #a built in dataset from the tidyverse package
+
+#if you would like to put in your own csv or dataframe in use this code: read.csv("nameofexcel.csv")
+```
+
+#joining country location data with its name
+```{r}
+#right now our population dataframe only has the country name and population but we want the longitude and latitude so we can have cool cross hashings occur across continents
+joinData <- joinCountryData2Map(population,
+                                 joinCode = "NAME",
+                                 nameJoinColumn = "country")
+#may take a sec to load
+```
+
+#abstract map plot
+```{r}
+#NOW YOU CAN SEE YOUR COOL MAP!! feel free to adjust parameters and mess around with it further
+abstract_map <- ggplot() +
+  geom_polygon(data=joinData, fill="black", #you can change the fill to be any color
+               aes(long, lat, group = "freq"), inherit.aes = F) +
+               coord_fixed() + theme_classic()
+abstract_map
+```
+
+#save your plot!
+```{r}
+#save with the name you picked for your map and the name you want for your new jpg file
+ggsave("abstract_map.jpg", abstract_map, dpi=300, width = 5, height =5)
+```
+
+####MAKING A BIRTHDAY PLOT#####
+#you can make any fun themed ggplot if you know what emoji you need. Further, if you download an image to be your background it can be anything!
+```{r}
+#make a dataframe that has the coordinates of the birthday cakes on the graph (you can change this however you'd like!)
+emoji_plot <- data.frame(x = c(10, 15, 23, 27, 43, 56, 62, 76, 84, 92, 95), 
+                        y = c(12, 71, 17, 84, 30, 70, 26, 82, 16, 26, 90)) #this just provides a location for the emoji to land on your plot, feel free to adjust it by adding more or fewer coordinates
+
+emoji_search("Birthday") #<- finds the birthday cake emoji and its corresponding code (1f382), this code is what you'll put in your ggplot code. You can replace this with any number of items like pumpkin (1f383), rams (1f403), to name a few lol
+
+
+```
+
+#making the plot
+```{r}
+
+birthday_plot <-  ggplot() +
+  geom_text(aes(x = 50, y = 50),label = "Happy Birthday \n Person!", 
+            size = 10, color = "darkblue") + #can change the color of your font
+  coord_cartesian(xlim = c(0, 100), ylim = c(0, 100)) + 
+  labs(y = "You're old", x = "Make a wish!") +
+  geom_emoji(data = bday_plot, aes(x = x, y = y), emoji="1f382", size = .1)+     theme_light()
+
+birthday_plot
+
+```
+
+#save your plot
+```{r}
+#you can this same code with your abstract map visual from above, just replace "birthday_plot" with your name for your map and the name you want for your new jpg file
+ggsave("birthday_plot.jpg", birthday_plot, dpi=300, width = 5, height =5)
+```
+
+#Adding a background image to your plot
+```{r}
+#this gets a little bit more complicated simply bc you have to download a jpg of your choice and it put in the folder you are working in aka your "working directory" but you can do it! I believe in youuu
+
+#THIS CODE WILL NOT WORK UNTIL YOU REPLACE "YOURIMAGENAME" with its actual name in your file folder!
+
+yourimage_jpg <- readJPEG("yourimagename.jpg") #R reads in your image and it pops up as a value in your global environment
+```
+
+#your ggplot with a fun background image
+```{r}
+#now we have to add another layer to our ggplot called "annotation_custom", it allows us to insert the background image
+background_plot <- ggplot() + 
+  annotation_custom(rasterGrob(yourimage_jpg, 
+                               width = unit(1,"npc"), 
+                               height = unit(1,"npc")), 
+                               -Inf, Inf, -Inf, Inf) +
+  geom_text(aes(x = 50, y = 50),label = "Happy Halloween!", 
+            size = 10, color = "black") +
+  coord_cartesian(xlim = c(0, 100), ylim = c(0, 100)) + 
+  labs(y = "Boo!!", x = "Trick or Treat ;)") +
+  geom_emoji(data = emoji_plot, aes(x = x, y = y), 
+             emoji="1f47b", size = .1)+  #the emoji: ghosts   
+  theme_light()
+
+background_plot
+```
+
+#save your plot
+```{r}
+ggsave("your_plot.jpg", background_plot, dpi = 300, width = 5, height =5)
+```
+
+####YOU DID IT!!### CONGRATS :) hopefully you can make even cooler stuff with code next
