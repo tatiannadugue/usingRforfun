@@ -23,7 +23,6 @@ knitr::opts_chunk$set(echo = TRUE)
 #load in your packages
 ```{r}
 ###essential packages###
-library(readr) #to read in the data
 library(tidyverse) #like a mega universal package (contains many other helpful packages like ggplot in it as well as our dataframe)
 
 ###for making the abstract map###
