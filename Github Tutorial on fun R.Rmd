@@ -100,7 +100,7 @@ birthday_plot <-  ggplot() +
             size = 10, color = "darkblue") + #can change the color of your font
   coord_cartesian(xlim = c(0, 100), ylim = c(0, 100)) + 
   labs(y = "You're old", x = "Make a wish!") +
-  geom_emoji(data = bday_plot, aes(x = x, y = y), emoji="1f382", size = .1)+     theme_light()
+  geom_emoji(data = emoji_plot, aes(x = x, y = y), emoji="1f382", size = .1)+     theme_light()
 
 birthday_plot
 
